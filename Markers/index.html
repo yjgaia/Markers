@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Markers</title>
+		<style>
+			@import url('BASE_STYLE.css');
+			@import url('github-markdown.css');
+		</style>
+		<style>
+			html, body {
+				background-color : #fff;
+				color : #000;
+			}
+		</style>
+	</head>
+	<body>
+		<script>
+			global = window;
+			nodeGlobal = process.mainModule.exports.nodeGlobal;
+		</script>
+		<script src="UPPERCASE.JS-COMMON.js"></script>
+		<script src="UPPERCASE.JS-BROWSER.js"></script>
+		<script src="marked.js"></script>
+		<script src="MAIN.js"></script>
+		<script>
+			READY(function() {
+				INIT_OBJECTS();
+				MAIN();
+			});
+			
+			// maximize window.
+			require('nw.gui').Window.get().maximize();
+		</script>
+	</body>
+</html>
