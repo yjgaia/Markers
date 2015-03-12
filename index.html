@@ -3,10 +3,9 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Markers</title>
-		<style>
-			@import url('BASE_STYLE.css');
-			@import url('github-markdown.css');
-		</style>
+		<link rel="stylesheet" type="text/css" href="BASE_STYLE.css">
+		<link rel="stylesheet" type="text/css" href="github-markdown.css">
+		<link rel="stylesheet" type="text/css" href="github-highlight.css">
 		<style>
 			html, body {
 				background-color : #fff;
@@ -22,9 +21,17 @@
 		<script src="UPPERCASE.JS-COMMON.js"></script>
 		<script src="UPPERCASE.JS-BROWSER.js"></script>
 		<script src="ace.js"></script>
+		<script src="highlight.js"></script>
 		<script src="marked.js"></script>
 		<script src="MAIN.js"></script>
 		<script>
+			// Synchronous highlighting with highlight.js
+			marked.setOptions({
+				highlight : function (code) {
+					return hljs.highlightAuto(code).value;
+				}
+			});
+			
 			READY(function() {
 				INIT_OBJECTS();
 				MAIN();
