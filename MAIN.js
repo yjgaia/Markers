@@ -34,6 +34,15 @@ global.MAIN = METHOD({
 		// preview
 		preview,
 		
+		// confirm not saved.
+		confirmNotSaved = function() {
+			
+			return confirm(MSG({
+				en : 'Unsaved document will be erased. Do you want to continue?',
+				ko : '저장하지 않은 문서는 지워집니다. 계속하시겠습니까?'
+			}));
+		},
+		
 		// load file.
 		loadFile = function(file) {
 			
@@ -136,10 +145,7 @@ global.MAIN = METHOD({
 					}),
 					on : {
 						tap : function() {
-							if (aceEditor.getValue() === originContent ? true : confirm(MSG({
-								en : 'Unsaved document will be erased. Do you want to continue?',
-								ko : '저장하지 않은 문서는 지워집니다. 계속하시겠습니까?'
-							})) === true) {
+							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 								originContent = '';
 								nowFilePath = undefined;
 								aceEditor.setValue('', 1);
@@ -156,10 +162,7 @@ global.MAIN = METHOD({
 					}),
 					on : {
 						tap : function() {
-							if (aceEditor.getValue() === originContent ? true : confirm(MSG({
-								en : 'Unsaved document will be erased. Do you want to continue?',
-								ko : '저장하지 않은 문서는 지워집니다. 계속하시겠습니까?'
-							})) === true) {
+							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 								loadFileInput.select();
 							}
 						}
@@ -270,7 +273,9 @@ global.MAIN = METHOD({
 		
 		global.ondrop = function(e) {
 			
-			loadFile(e.dataTransfer.files[0]);
+			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+				loadFile(e.dataTransfer.files[0]);
+			}
 			
 			e.preventDefault();
 			

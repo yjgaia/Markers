@@ -1,5 +1,5 @@
 # Markers
-Markdown Editor
+[UPPERCASE.JS-Based](https://github.com/Hanul/UPPERCASE.JS) Markdown Editor
 
 ![ScreenShot](https://raw.githubusercontent.com/Hanul/Markers/master/Markers.png)
 
