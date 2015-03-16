@@ -7,6 +7,18 @@ global.MAIN = METHOD({
 		//IMPORT: gui
 		gui = require('nw.gui'),
 		
+		// origin content
+		originContent = '',
+		
+		// now file path
+		nowFilePath,
+		
+		// load file input
+		loadFileInput,
+		
+		// save file input
+		saveFileInput,
+		
 		// editor
 		editor,
 		
@@ -20,10 +32,88 @@ global.MAIN = METHOD({
 		beforeContent,
 		
 		// preview
-		preview;
+		preview,
+		
+		// load file.
+		loadFile = function(file) {
+			
+			var
+			// reader
+			reader = new FileReader();
+			
+			reader.onload = function() {
+				originContent = reader.result;
+				aceEditor.setValue(originContent, 1);
+			};
+			
+			reader.readAsText(file);
+			
+			nowFilePath = file.path;
+		},
+		
+		// save.
+		save = function() {
+			
+			if (nowFilePath === undefined) {
+				saveFileInput.select();
+			} else {
+				
+				originContent = aceEditor.getValue();
+				
+				nodeGlobal.WRITE_FILE({
+					path : nowFilePath,
+					content : originContent
+				});
+			}
+		};
 		
 		DIV({
 			c : [
+			// load file input
+			loadFileInput = INPUT({
+				style : {
+					display : 'none'
+				},
+				type : 'file',
+				on : {
+					change : function() {
+						
+						if (loadFileInput.getValue() !== '') {
+						
+							loadFile(loadFileInput.getEl().files[0]);
+							
+							loadFileInput.setValue('');
+						}
+					}
+				}
+			}),
+			
+			// save file input
+			saveFileInput = INPUT({
+				style : {
+					display : 'none'
+				},
+				type : 'file',
+				on : {
+					change : function() {
+						
+						if (saveFileInput.getValue() !== '') {
+						
+							nowFilePath = saveFileInput.getValue();
+							
+							originContent = aceEditor.getValue();
+							
+							nodeGlobal.WRITE_FILE({
+								path : nowFilePath,
+								content : originContent
+							});
+							
+							saveFileInput.setValue('');
+						}
+					}
+				}
+			}),
+			
 			// menu
 			DIV({
 				style : {
@@ -42,8 +132,38 @@ global.MAIN = METHOD({
 							width : 40,
 							height : 40
 						},
+						src : 'icon/new.png'
+					}),
+					on : {
+						tap : function() {
+							if (aceEditor.getValue() === originContent ? true : confirm(MSG({
+								en : 'Unsaved document will be erased. Do you want to continue?',
+								ko : '저장하지 않은 문서는 지워집니다. 계속하시겠습니까?'
+							})) === true) {
+								originContent = '';
+								nowFilePath = undefined;
+								aceEditor.setValue('', 1);
+							}
+						}
+					}
+				}), A({
+					c : IMG({
+						style : {
+							width : 40,
+							height : 40
+						},
 						src : 'icon/open.png'
-					})
+					}),
+					on : {
+						tap : function() {
+							if (aceEditor.getValue() === originContent ? true : confirm(MSG({
+								en : 'Unsaved document will be erased. Do you want to continue?',
+								ko : '저장하지 않은 문서는 지워집니다. 계속하시겠습니까?'
+							})) === true) {
+								loadFileInput.select();
+							}
+						}
+					}
 				}), A({
 					style : {
 						marginLeft : 5
@@ -54,7 +174,12 @@ global.MAIN = METHOD({
 							height : 40
 						},
 						src : 'icon/save.png'
-					})
+					}),
+					on : {
+						tap : function() {
+							save();
+						}
+					}
 				}), A({
 					style : {
 						position : 'fixed',
@@ -107,11 +232,13 @@ global.MAIN = METHOD({
 			}), CLEAR_BOTH()]
 		}).appendTo(BODY);
 		
+		saveFileInput.getEl().setAttribute('nwsaveas', '*.md');
+		
 		preview.getEl().setAttribute('class', 'markdown-body');
 		
 		aceEditor = ace.edit(editor.getEl());
-	    aceEditor.setTheme("ace/theme/twilight");
-	    aceEditor.getSession().setMode("ace/mode/markdown");
+	    aceEditor.setTheme('ace/theme/twilight');
+	    aceEditor.getSession().setMode('ace/mode/markdown');
 	    aceEditor.getSession().on('change', function() {
 	    	
 			if (keydownTimeout !== undefined) {
@@ -133,5 +260,17 @@ global.MAIN = METHOD({
 				
 			}, 500);
 		});
+		
+		global.onkeydown = function(e) {
+				
+			if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) === true) {
+				
+				save();
+			
+				e.preventDefault();
+				
+			    return false;
+			}
+		};
 	}
 });
