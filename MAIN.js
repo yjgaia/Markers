@@ -261,6 +261,22 @@ global.MAIN = METHOD({
 			}, 500);
 		});
 		
+		global.ondragover = function(e) {
+			
+			e.preventDefault();
+			
+			return false;
+		};
+		
+		global.ondrop = function(e) {
+			
+			loadFile(e.dataTransfer.files[0]);
+			
+			e.preventDefault();
+			
+			return false;
+		};
+		
 		global.onkeydown = function(e) {
 				
 			if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) === true) {
@@ -272,5 +288,15 @@ global.MAIN = METHOD({
 			    return false;
 			}
 		};
+		
+		if (gui.App.argv[0] !== undefined) {
+			
+			nowFilePath = gui.App.argv[0];
+			
+			nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
+				originContent = buffer.toString();
+				aceEditor.setValue(originContent, 1);
+			});
+		}
 	}
 });
