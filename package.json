@@ -3,6 +3,7 @@
     "main" : "index.html",
     "node-main": "index.js",
     "window" : {
-        "toolbar" : false
+        "toolbar" : false,
+        "icon" : "icon/icon.png"
     }
 }
