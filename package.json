@@ -2,6 +2,7 @@
     "name" : "Markers",
     "main" : "index.html",
     "node-main": "index.js",
+    "single-instance" : false,
     "window" : {
         "toolbar" : false,
         "icon" : "icon/icon.png"
