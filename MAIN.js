@@ -273,6 +273,7 @@ global.MAIN = METHOD({
 		aceEditor = ace.edit(editor.getEl());
 	    aceEditor.setTheme('ace/theme/twilight');
 	    aceEditor.getSession().setMode('ace/mode/markdown');
+	    aceEditor.getSession().setUseWrapMode(true);
 	    aceEditor.renderer.setScrollMargin(0, 300);
 	    aceEditor.getSession().on('change', function() {
 	    	
