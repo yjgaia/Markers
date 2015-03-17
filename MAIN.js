@@ -324,6 +324,12 @@ global.MAIN = METHOD({
 			}
 		};
 		
+		gui.Window.get().on('close', function() {
+			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+				this.close(true);
+			}
+		});
+		
 		if (gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];
