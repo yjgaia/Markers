@@ -7,6 +7,9 @@ global.MAIN = METHOD({
 		//IMPORT: gui
 		gui = require('nw.gui'),
 		
+		// origin title
+		originTitle = 'Markers :: Markdown Editor',
+		
 		// origin content
 		originContent = '',
 		
@@ -34,6 +37,29 @@ global.MAIN = METHOD({
 		// preview
 		preview,
 		
+		// get file name from path.
+		getFileNameFromPath = function(path) {
+			
+			var
+			// a
+			a = path.lastIndexOf('\\'),
+			
+			// b
+			b = path.lastIndexOf('/');
+			
+			if (a === -1 && b === -1) {
+				return path;
+			} else if (b === -1) {
+				return path.substring(a + 1);
+			} else if (a === -1) {
+				return path.substring(b + 1);
+			} else if (a > b) {
+				return path.substring(a + 1);
+			} else {
+				return path.substring(b + 1);
+			}
+		},
+		
 		// confirm not saved.
 		confirmNotSaved = function() {
 			
@@ -58,6 +84,7 @@ global.MAIN = METHOD({
 			reader.readAsText(file);
 			
 			nowFilePath = file.path;
+			TITLE(getFileNameFromPath(nowFilePath));
 		},
 		
 		// save.
@@ -109,6 +136,7 @@ global.MAIN = METHOD({
 						if (saveFileInput.getValue() !== '') {
 						
 							nowFilePath = saveFileInput.getValue();
+							TITLE(getFileNameFromPath(nowFilePath));
 							
 							originContent = aceEditor.getValue();
 							
@@ -149,6 +177,7 @@ global.MAIN = METHOD({
 							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 								originContent = '';
 								nowFilePath = undefined;
+								TITLE(originTitle);
 								aceEditor.setValue('', 1);
 							}
 						}
@@ -298,6 +327,7 @@ global.MAIN = METHOD({
 		if (gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];
+			TITLE(getFileNameFromPath(nowFilePath));
 			
 			nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
 				originContent = buffer.toString();

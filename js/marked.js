@@ -1,3 +1,5 @@
+// EDITED by Hanul for Markers
+
 /**
  * marked - a markdown parser
  * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)
@@ -786,6 +788,11 @@ Renderer.prototype.html = function(html) {
 };
 
 Renderer.prototype.heading = function(text, level, raw) {
+  
+  if (level === 1) {
+  	TITLE(text);
+  }
+  
   return '<h'
     + level
     + ' id="'
@@ -812,7 +819,7 @@ Renderer.prototype.listitem = function(text) {
 };
 
 Renderer.prototype.paragraph = function(text) {
-  return '<p>' + text.replace(/\n/g, '<br>') + '</p>\n';
+  return '<p>' + text + '</p>\n';
 };
 
 Renderer.prototype.table = function(header, body) {
