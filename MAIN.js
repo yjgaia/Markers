@@ -253,6 +253,7 @@ global.MAIN = METHOD({
 			DIV({
 				style : {
 					paddingTop : 50,
+					paddingBottom : 300,
 					flt : 'right',
 					width : '50%'
 				},
@@ -272,6 +273,7 @@ global.MAIN = METHOD({
 		aceEditor = ace.edit(editor.getEl());
 	    aceEditor.setTheme('ace/theme/twilight');
 	    aceEditor.getSession().setMode('ace/mode/markdown');
+	    aceEditor.renderer.setScrollMargin(0, 300);
 	    aceEditor.getSession().on('change', function() {
 	    	
 			if (keydownTimeout !== undefined) {
