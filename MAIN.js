@@ -133,7 +133,8 @@ global.MAIN = METHOD({
 					width : '100%',
 					height : 40,
 					backgroundColor : '#AB1A2D',
-					boxShadow : 'inset 0 -10px 10px -10px #000'
+					boxShadow : 'inset 0 -10px 10px -10px #000',
+					zIndex : 999
 				},
 				c : [A({
 					c : IMG({
