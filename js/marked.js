@@ -788,11 +788,6 @@ Renderer.prototype.html = function(html) {
 };
 
 Renderer.prototype.heading = function(text, level, raw) {
-  
-  if (level === 1) {
-  	TITLE(text);
-  }
-  
   return '<h'
     + level
     + ' id="'

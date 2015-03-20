@@ -7,6 +7,9 @@ global.MAIN = METHOD({
 		//IMPORT: gui
 		gui = require('nw.gui'),
 		
+		// markdown generate worker
+		markdownGenerateWorker = new Worker('js/markdown-generate-worker.js'),
+		
 		// origin title
 		originTitle = 'Markers :: Markdown Editor',
 		
@@ -27,9 +30,6 @@ global.MAIN = METHOD({
 		
 		// ace editor
 		aceEditor,
-		
-		// keydown timeout
-		keydownTimeout,
 		
 		// before content
 		beforeContent,
@@ -266,10 +266,34 @@ global.MAIN = METHOD({
 			}), CLEAR_BOTH()]
 		}).appendTo(BODY);
 		
+		// change preview.
+		markdownGenerateWorker.addEventListener('message', function(e) {
+			
+			var
+			// title el
+			titleEl;
+			
+			// set preview.
+			preview.getEl().innerHTML = e.data;
+			
+			titleEl = preview.getEl().getElementsByTagName('h1')[0];
+			
+			// set title.
+			if (titleEl !== undefined) {
+				TITLE(titleEl.innerText);
+			} else {
+				TITLE(originTitle);
+			}
+			
+		}, false);
+		
+		// set extention md.
 		saveFileInput.getEl().setAttribute('nwsaveas', '*.md');
 		
+		// set style.
 		preview.getEl().setAttribute('class', 'markdown-body');
 		
+		// create ace editor.
 		aceEditor = ace.edit(editor.getEl());
 	    aceEditor.setTheme('ace/theme/twilight');
 	    aceEditor.getSession().setMode('ace/mode/markdown');
@@ -277,33 +301,21 @@ global.MAIN = METHOD({
 	    aceEditor.renderer.setScrollMargin(0, 300);
 	    aceEditor.getSession().on('change', function() {
 	    	
-			if (keydownTimeout !== undefined) {
-				clearTimeout(keydownTimeout);
-			}
+			var
+			// content
+			content = aceEditor.getValue();
 			
-			keydownTimeout = setTimeout(function() {
-				
-				var
-				// content
-				content = aceEditor.getValue();
-				
-				if (beforeContent !== content) {
-					preview.getEl().innerHTML = marked(content);
-					beforeContent = content;
-				}
-				
-				keydownTimeout = undefined;
-				
-			}, 500);
+			if (beforeContent !== content) {
+				markdownGenerateWorker.postMessage(content);
+				beforeContent = content;
+			}
 		});
 		
+		// open with draw and drop.
 		global.ondragover = function(e) {
-			
 			e.preventDefault();
-			
 			return false;
 		};
-		
 		global.ondrop = function(e) {
 			
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
@@ -311,28 +323,37 @@ global.MAIN = METHOD({
 			}
 			
 			e.preventDefault();
-			
 			return false;
 		};
 		
 		global.onkeydown = function(e) {
 				
-			if (e.keyCode === 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) === true) {
+			if ((navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey) === true) {
 				
-				save();
-			
-				e.preventDefault();
-				
-			    return false;
+				// ctrl + s to save
+				if (e.keyCode === 83) {
+					save();
+					e.preventDefault();
+					return false;
+			    }
+			    
+			    // ctrl + w to close
+				else if (e.keyCode === 87) {
+					gui.Window.get().close();
+					e.preventDefault();
+					return false;
+			    }
 			}
 		};
 		
+		// not close when not saved.
 		gui.Window.get().on('close', function() {
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 				this.close(true);
 			}
 		});
 		
+		// when open with argument
 		if (gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];

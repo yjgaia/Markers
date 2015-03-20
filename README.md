@@ -15,3 +15,8 @@
 
 ## Author
 [Young Jae Sim](https://github.com/Hanul)
+
+## Change Logs
+###### 1.1.0 (2015-03-20)
+* use WebWorker to speed up
+* ctrl + w to close
