@@ -78,7 +78,7 @@ global.MAIN = METHOD({
 			
 			reader.onload = function() {
 				originContent = reader.result;
-				aceEditor.setValue(originContent, 1);
+				aceEditor.setValue(originContent);
 			};
 			
 			reader.readAsText(file);
@@ -178,7 +178,7 @@ global.MAIN = METHOD({
 								originContent = '';
 								nowFilePath = undefined;
 								TITLE(originTitle);
-								aceEditor.setValue('', 1);
+								aceEditor.setValue('');
 							}
 						}
 					}
@@ -295,12 +295,12 @@ global.MAIN = METHOD({
 		
 		// create ace editor.
 		aceEditor = ace.edit(editor.getEl());
-	    aceEditor.setTheme('ace/theme/twilight');
-	    aceEditor.getSession().setMode('ace/mode/markdown');
-	    aceEditor.getSession().setUseWrapMode(true);
-	    aceEditor.renderer.setScrollMargin(0, 300);
-	    aceEditor.getSession().on('change', function() {
-	    	
+		aceEditor.setTheme('ace/theme/twilight');
+		aceEditor.getSession().setMode('ace/mode/markdown');
+		aceEditor.getSession().setUseWrapMode(true);
+		aceEditor.renderer.setScrollMargin(0, 300);
+		aceEditor.getSession().on('change', function() {
+			
 			var
 			// content
 			content = aceEditor.getValue();
@@ -308,6 +308,35 @@ global.MAIN = METHOD({
 			if (beforeContent !== content) {
 				markdownGenerateWorker.postMessage(content);
 				beforeContent = content;
+			}
+		});
+		aceEditor.commands.addCommand({
+			name : 'replace2',
+			bindKey : {
+				win : 'Ctrl-R',
+				mac : 'Command-Option-F'
+			},
+			exec : function(editor) {
+				
+				require('ace/config').loadModule('ace/ext/searchbox', function(e) {
+					 
+					 e.Search(editor, true);
+					 
+					 // take care of keybinding inside searchbox		   
+					 // this is too hacky :(	 
+					 
+					 var
+					 // kb
+					 kb = editor.searchBox.$searchBarKb,
+					 
+					 // command
+					 command = kb.commands['Ctrl-f|Command-f|Ctrl-H|Command-Option-F'];
+					 
+					 if (command.bindKey.indexOf('Ctrl-R') === -1) {
+						 command.bindKey += '|Ctrl-R';
+						 kb.addCommand(command);
+					 }
+				 });
 			}
 		});
 		
@@ -335,14 +364,14 @@ global.MAIN = METHOD({
 					save();
 					e.preventDefault();
 					return false;
-			    }
-			    
-			    // ctrl + w to close
+				}
+				
+				// ctrl + w to close
 				else if (e.keyCode === 87) {
 					gui.Window.get().close();
 					e.preventDefault();
 					return false;
-			    }
+				}
 			}
 		};
 		
@@ -361,7 +390,7 @@ global.MAIN = METHOD({
 			
 			nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
 				originContent = buffer.toString();
-				aceEditor.setValue(originContent, 1);
+				aceEditor.setValue(originContent);
 			});
 		}
 	}

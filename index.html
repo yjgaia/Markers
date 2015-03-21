@@ -20,18 +20,9 @@
 		</script>
 		<script src="UPPERCASE.JS-COMMON.js"></script>
 		<script src="UPPERCASE.JS-BROWSER.js"></script>
-		<script src="js/ace.js"></script>
-		<script src="js/highlight.js"></script>
-		<script src="js/marked.js"></script>
+		<script src="js/ace/ace.js"></script>
 		<script src="MAIN.js"></script>
 		<script>
-			// Synchronous highlighting with highlight.js
-			marked.setOptions({
-				highlight : function (code) {
-					return hljs.highlightAuto(code).value;
-				}
-			});
-			
 			READY(function() {
 				INIT_OBJECTS();
 				MAIN();

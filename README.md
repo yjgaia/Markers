@@ -17,6 +17,10 @@
 [Young Jae Sim](https://github.com/Hanul)
 
 ## Change Logs
+###### 1.2.0 (2015-03-21)
+* ctrl + f to find
+* ctrl + r & ctrl + h to replace
+
 ###### 1.1.0 (2015-03-20)
 * use WebWorker to speed up
 * ctrl + w to close
