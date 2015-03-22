@@ -31,6 +31,9 @@ global.MAIN = METHOD({
 		// ace editor
 		aceEditor,
 		
+		// keydown timeout
+		keydownTimeout,
+		
 		// before content
 		beforeContent,
 		
@@ -78,7 +81,7 @@ global.MAIN = METHOD({
 			
 			reader.onload = function() {
 				originContent = reader.result;
-				aceEditor.setValue(originContent);
+				aceEditor.setValue(originContent, -1);
 			};
 			
 			reader.readAsText(file);
@@ -178,7 +181,7 @@ global.MAIN = METHOD({
 								originContent = '';
 								nowFilePath = undefined;
 								TITLE(originTitle);
-								aceEditor.setValue('');
+								aceEditor.setValue('', -1);
 							}
 						}
 					}
@@ -301,14 +304,24 @@ global.MAIN = METHOD({
 		aceEditor.renderer.setScrollMargin(0, 300);
 		aceEditor.getSession().on('change', function() {
 			
-			var
-			// content
-			content = aceEditor.getValue();
-			
-			if (beforeContent !== content) {
-				markdownGenerateWorker.postMessage(content);
-				beforeContent = content;
+			if (keydownTimeout !== undefined) {
+				clearTimeout(keydownTimeout);
 			}
+			
+			keydownTimeout = setTimeout(function() {
+				
+				var
+				// content
+				content = aceEditor.getValue();
+				
+				if (beforeContent !== content) {
+					markdownGenerateWorker.postMessage(content);
+					beforeContent = content;
+				}
+				
+				keydownTimeout = undefined;
+				
+			}, 500);
 		});
 		aceEditor.commands.addCommand({
 			name : 'replace2',
@@ -390,7 +403,7 @@ global.MAIN = METHOD({
 			
 			nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
 				originContent = buffer.toString();
-				aceEditor.setValue(originContent);
+				aceEditor.setValue(originContent, -1);
 			});
 		}
 	}

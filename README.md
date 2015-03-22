@@ -17,6 +17,9 @@
 [Young Jae Sim](https://github.com/Hanul)
 
 ## Change Logs
+###### 1.2.1 (2015-03-23)
+* fix memory leak
+
 ###### 1.2.0 (2015-03-21)
 * ctrl + f to find
 * ctrl + r & ctrl + h to replace
