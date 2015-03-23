@@ -75,22 +75,43 @@ global.MAIN = METHOD({
 			}));
 		},
 		
+		// check backup
+		checkBackup = function() {
+			
+			if (backupStore.get(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath) !== undefined) {
+				alert(MSG({
+					en : 'recovering a lost document.',
+					ko : '저장되지 않은 문서를 복구합니다.'
+				}));
+				aceEditor.setValue(backupStore.get(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath), -1);
+				
+				return true;
+			}
+			
+			return false;
+		},
+		
 		// load file.
 		loadFile = function(file) {
 			
 			var
 			// reader
-			reader = new FileReader();
-			
-			reader.onload = function() {
-				originContent = reader.result;
-				aceEditor.setValue(originContent, -1);
-			};
-			
-			reader.readAsText(file);
+			reader;
 			
 			nowFilePath = file.path;
-			TITLE(getFileNameFromPath(nowFilePath));
+			
+			if (checkBackup() !== true) {
+				
+				reader = new FileReader();
+				
+				reader.onload = function() {
+					originContent = reader.result;
+					aceEditor.setValue(originContent, -1);
+				};
+				
+				reader.readAsText(file);
+				TITLE(getFileNameFromPath(nowFilePath));
+			}
 		},
 		
 		// save.
@@ -181,11 +202,11 @@ global.MAIN = METHOD({
 					on : {
 						tap : function() {
 							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+								backupStore.remove(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath);
 								originContent = '';
 								nowFilePath = undefined;
 								TITLE(originTitle);
 								aceEditor.setValue('', -1);
-								backupStore.remove('content');
 							}
 						}
 					}
@@ -200,8 +221,8 @@ global.MAIN = METHOD({
 					on : {
 						tap : function() {
 							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+								backupStore.remove(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath);
 								loadFileInput.select();
-								backupStore.remove('content');
 							}
 						}
 					}
@@ -314,7 +335,7 @@ global.MAIN = METHOD({
 			content = aceEditor.getValue();
 			
 			backupStore.save({
-				name : 'content',
+				name : nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath,
 				value : content
 			});
 			
@@ -371,8 +392,8 @@ global.MAIN = METHOD({
 		global.ondrop = function(e) {
 			
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+				backupStore.remove(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath);
 				loadFile(e.dataTransfer.files[0]);
-				backupStore.remove('content');
 			}
 			
 			e.preventDefault();
@@ -402,30 +423,29 @@ global.MAIN = METHOD({
 		// not close when not saved.
 		gui.Window.get().on('close', function() {
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
-				backupStore.remove('content');
+				backupStore.remove(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath);
 				this.close(true);
 			}
 		});
-		
-		// restore backup content
-		if (backupStore.get('content') !== undefined) {
-			alert(MSG({
-				en : 'recovering a lost document.',
-				ko : '저장되지 않은 문서를 복구합니다.'
-			}));
-			aceEditor.setValue(backupStore.get('content'), -1);
-		}
 
 		// when open with argument
-		else if (gui.App.argv[0] !== undefined) {
+		if (gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];
 			TITLE(getFileNameFromPath(nowFilePath));
 			
-			nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
-				originContent = buffer.toString();
-				aceEditor.setValue(originContent, -1);
-			});
+			if (checkBackup() !== true) {
+			
+				nodeGlobal.READ_FILE(nowFilePath, function(buffer) {
+					originContent = buffer.toString();
+					aceEditor.setValue(originContent, -1);
+				});
+			}
+		}
+		
+		// restore backup content
+		else {
+			checkBackup();
 		}
 	}
 });
