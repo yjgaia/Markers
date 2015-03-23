@@ -7,6 +7,9 @@ global.MAIN = METHOD({
 		//IMPORT: gui
 		gui = require('nw.gui'),
 		
+		// backup store
+		backupStore = STORE('backupStore'),
+		
 		// markdown generate worker
 		markdownGenerateWorker = new Worker('js/markdown-generate-worker.js'),
 		
@@ -182,6 +185,7 @@ global.MAIN = METHOD({
 								nowFilePath = undefined;
 								TITLE(originTitle);
 								aceEditor.setValue('', -1);
+								backupStore.remove('content');
 							}
 						}
 					}
@@ -197,6 +201,7 @@ global.MAIN = METHOD({
 						tap : function() {
 							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 								loadFileInput.select();
+								backupStore.remove('content');
 							}
 						}
 					}
@@ -303,16 +308,21 @@ global.MAIN = METHOD({
 		aceEditor.getSession().setUseWrapMode(true);
 		aceEditor.renderer.setScrollMargin(0, 300);
 		aceEditor.getSession().on('change', function() {
+				
+			var
+			// content
+			content = aceEditor.getValue();
+			
+			backupStore.save({
+				name : 'content',
+				value : content
+			});
 			
 			if (keydownTimeout !== undefined) {
 				clearTimeout(keydownTimeout);
 			}
 			
 			keydownTimeout = setTimeout(function() {
-				
-				var
-				// content
-				content = aceEditor.getValue();
 				
 				if (beforeContent !== content) {
 					markdownGenerateWorker.postMessage(content);
@@ -362,6 +372,7 @@ global.MAIN = METHOD({
 			
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
 				loadFile(e.dataTransfer.files[0]);
+				backupStore.remove('content');
 			}
 			
 			e.preventDefault();
@@ -391,12 +402,22 @@ global.MAIN = METHOD({
 		// not close when not saved.
 		gui.Window.get().on('close', function() {
 			if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
+				backupStore.remove('content');
 				this.close(true);
 			}
 		});
 		
+		// restore backup content
+		if (backupStore.get('content') !== undefined) {
+			alert(MSG({
+				en : 'recovering a lost document.',
+				ko : '저장되지 않은 문서를 복구합니다.'
+			}));
+			aceEditor.setValue(backupStore.get('content'), -1);
+		}
+
 		// when open with argument
-		if (gui.App.argv[0] !== undefined) {
+		else if (gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];
 			TITLE(getFileNameFromPath(nowFilePath));

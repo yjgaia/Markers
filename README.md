@@ -17,6 +17,9 @@
 [Young Jae Sim](https://github.com/Hanul)
 
 ## Change Logs
+###### 1.2.2 (2015-03-24)
+* recovering a lost document
+
 ###### 1.2.1 (2015-03-23)
 * fix memory leak
 
