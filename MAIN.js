@@ -204,7 +204,7 @@ global.MAIN = METHOD({
 							if (nowFilePath === undefined) {
 								backupStore.remove('__NO_NAME_FILE!');
 							}
-							open(location.href);
+							open(location.href.replace(location.hash, '') + '#__NEW');
 						}
 					}
 				}), A({
@@ -420,7 +420,7 @@ global.MAIN = METHOD({
 					if (nowFilePath === undefined) {
 						backupStore.remove('__NO_NAME_FILE!');
 					}
-					open(location.href);
+					open(location.href.replace(location.hash, '') + '#__NEW');
 					e.preventDefault();
 					return false;
 				}
@@ -436,7 +436,7 @@ global.MAIN = METHOD({
 		});
 
 		// when open with argument
-		if (gui.App.argv[0] !== undefined) {
+		if (location.hash !== '#__NEW' && gui.App.argv[0] !== undefined) {
 			
 			nowFilePath = gui.App.argv[0];
 			TITLE(getFileNameFromPath(nowFilePath));
