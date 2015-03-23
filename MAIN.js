@@ -201,13 +201,10 @@ global.MAIN = METHOD({
 					}),
 					on : {
 						tap : function() {
-							if (aceEditor.getValue() === originContent ? true : confirmNotSaved() === true) {
-								backupStore.remove(nowFilePath === undefined ? '__NO_NAME_FILE!' : nowFilePath);
-								originContent = '';
-								nowFilePath = undefined;
-								TITLE(originTitle);
-								aceEditor.setValue('', -1);
+							if (nowFilePath === undefined) {
+								backupStore.remove('__NO_NAME_FILE!');
 							}
+							open(location.href);
 						}
 					}
 				}), A({
@@ -417,6 +414,16 @@ global.MAIN = METHOD({
 					e.preventDefault();
 					return false;
 				}
+				
+				// ctrl + n to new window
+				else if (e.keyCode === 78) {
+					if (nowFilePath === undefined) {
+						backupStore.remove('__NO_NAME_FILE!');
+					}
+					open(location.href);
+					e.preventDefault();
+					return false;
+				}
 			}
 		};
 		
@@ -444,8 +451,8 @@ global.MAIN = METHOD({
 		}
 		
 		// restore backup content
-		else {
-			checkBackup();
+		else if (checkBackup() !== true) {
+			aceEditor.focus();
 		}
 	}
 });
