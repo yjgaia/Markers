@@ -10,6 +10,12 @@
 4. Edit document.
 5. Save. (Ctrl + S)
 
+## .md 파일을 연동하려면? (Windows)
+1. .md 파일에서 오른쪽 클릭 -> 연결 프로그램 -> 기본 프로그램 선택
+2. 모든 .md 파일에 이 앱 적용 체크
+3. 기타 옵션 -> 이 PC에서 다른 앱 찾기
+4. Markers.exe를 선택
+
 ## License
 [MIT](LICENSE)
 
