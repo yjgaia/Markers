@@ -308,7 +308,7 @@ global.MAIN = METHOD({
 			if (titleEl !== undefined) {
 				TITLE(titleEl.innerText);
 			} else {
-				TITLE(originTitle);
+				TITLE(nowFilePath === undefined ? originTitle : getFileNameFromPath(nowFilePath));
 			}
 			
 		}, false);
